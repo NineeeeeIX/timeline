@@ -2,21 +2,19 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>My Timeline</title>
-
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
     <!-- =========================================
-         TIMELINE CONTENT
+         TIMELINE
          ========================================= -->
 
     <main id="timeline">
       <div id="timeline-line"></div>
+      <!-- year sections สร้างจาก JS -->
     </main>
 
     <!-- =========================================
@@ -24,20 +22,27 @@
          ========================================= -->
 
     <section id="question">
-      <h1>คำถาม</h1>
-
-      <button>ตัวเลือกที่ 1</button>
-
-      <button>ตัวเลือกที่ 2</button>
+      <div id="question-content">
+        <h1 id="question-text">เราเจอกันครั้งแรกที่ไหน?</h1>
+        <p id="question-feedback"></p>
+        <button id="choice-1">ร้านกาแฟหน้ามหาลัย</button>
+        <button id="choice-2">สนามบินสุวรรณภูมิ</button>
+      </div>
     </section>
+
+    <!-- =========================================
+         FINAL OVERLAY (ตอบถูกแล้วแสดงรูป)
+         ========================================= -->
+
+    <div id="final-overlay">
+      <img id="final-image" src="image/final.jpg" alt="Congratulations" />
+    </div>
 
     <!-- =========================================
          JAVASCRIPT
          ========================================= -->
 
     <script src="data.js"></script>
-
     <script src="app.js"></script>
   </body>
 </html>
-

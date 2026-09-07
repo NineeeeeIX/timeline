@@ -12,20 +12,66 @@ html {
 
 body {
   margin: 0;
+
   font-family: Arial, sans-serif;
+
   background: #f5f5f5;
+
   color: #222;
 
-  /* ไม่ให้เกิด horizontal scroll ของทั้งเว็บ */
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 /* =========================================================
-   TIMELINE
+   TIMELINE LINE & YEAR BADGE
+   ========================================================= */
+
+#timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  transform: translateX(-50%);
+  background: #222;
+  z-index: 1;
+}
+
+.year-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  font-size: 28px;
+  font-weight: bold;
+  z-index: 15;
+}
+
+.year-dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #222;
+}
+
+
+/* =========================================================
+   TIMELINE WORLD
    ========================================================= */
 
 #timeline {
-  width: 100%;
+  position: relative;
+
+  min-width: 100vw;
 }
 
 /* =========================================================
@@ -33,136 +79,58 @@ body {
    ========================================================= */
 
 .year-section {
-  width: 100vw;
+  position: relative;
+
   height: 100vh;
 
-  position: relative;
-
-  /*
-     * สำคัญ:
-     * ตัว Year Section เป็นคน scroll แนวนอน
-     * ไม่ใช่ .events
-     */
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  scrollbar-width: none;
-
-  scroll-behavior: smooth;
-}
-
-.year-section::-webkit-scrollbar {
-  display: none;
+  overflow: visible;
 }
 
 /* =========================================================
-   YEAR CANVAS
+   EVENTS
    ========================================================= */
 
-.year-canvas {
-  height: 100%;
-
-  position: relative;
-
-  flex-shrink: 0;
-}
-
-/* =========================================================
-   TIMELINE LINE
-   ========================================================= */
-
-.timeline-line {
+.events {
   position: absolute;
-
-  top: 0;
-  bottom: 0;
-
-  width: 4px;
-
-  background: #222;
-
-  z-index: 1;
-}
-
-/*
- * ฝั่งซ้าย
- *
- * Canvas:
- *
- * Event 3 → Event 2 → Event 1 → Timeline
- *                              ↑
- *                         ตำแหน่งใน Canvas
- */
-
-.year-section.left .timeline-line {
-  left: calc(var(--events-width) + var(--branch-gap));
-}
-
-/*
- * ฝั่งขวา
- *
- * Canvas:
- *
- * Timeline → Event 1 → Event 2 → Event 3
- *     ↑
- *   50vw
- */
-
-.year-section.right .timeline-line {
-  left: 50vw;
-}
-
-/* =========================================================
-   YEAR POINT
-   ========================================================= */
-
-.year-point {
-  position: absolute;
-
   top: 50%;
-
-  transform: translate(-50%, -50%);
-
-  width: 120px;
-  height: 80px;
+  transform: translateY(-50%);
 
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 30px;
 
-  background: #f5f5f5;
+  width: max-content;
 
-  font-size: 28px;
-  font-weight: bold;
-
-  z-index: 5;
-}
-
-/* ปีฝั่งซ้าย */
-
-.year-section.left .year-point {
-  left: calc(var(--events-width) + var(--branch-gap));
-}
-
-/* ปีฝั่งขวา */
-
-.year-section.right .year-point {
-  left: 50vw;
+  z-index: 10;
 }
 
 /* =========================================================
-   YEAR DOT
+   LEFT EVENTS
    ========================================================= */
 
-.year-dot {
-  width: 18px;
-  height: 18px;
+/*
+ * สำคัญ:
+ *
+ * 50% = จุดกลางของ section
+ *
+ * Event 1 อยู่ใกล้ Timeline
+ * Event 2 อยู่ถัดออกไป
+ * Event 3 อยู่ไกลออกไป
+ */
 
-  margin-top: 8px;
+.year-section.left .events {
+  right: calc(50% + 80px);
 
-  border-radius: 50%;
+  flex-direction: row-reverse;
+}
 
-  background: #222;
+/* =========================================================
+   RIGHT EVENTS
+   ========================================================= */
+
+.year-section.right .events {
+  left: calc(50% + 80px);
+
+  flex-direction: row;
 }
 
 /* =========================================================
@@ -174,117 +142,40 @@ body {
 
   top: 50%;
 
+  width: 80px;
   height: 3px;
 
   transform: translateY(-50%);
 
   background: #222;
 
-  z-index: 2;
+  z-index: 5;
 }
 
-/*
- * ฝั่งซ้าย
- *
- * Timeline ←──────── Events
- */
+/* LEFT */
 
 .year-section.left .branch-line {
-  left: 50vw;
-
-  width: calc(var(--events-width) + var(--branch-gap));
+  right: 50%;
 }
 
-/*
- * ฝั่งขวา
- *
- * Timeline ────────→ Events
- */
+/* RIGHT */
 
 .year-section.right .branch-line {
-  left: 50vw;
-
-  width: var(--branch-gap);
+  left: 50%;
 }
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-.events {
-  position: absolute;
-
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  width: var(--events-width);
-
-  display: flex;
-
-  gap: 30px;
-
-  z-index: 3;
-}
-
-/* =========================================================
-   EVENTS - LEFT
-   ========================================================= */
-
-.year-section.left .events {
-  /*
-     * Events อยู่ทางซ้ายของ Timeline
-     */
-  left: 0;
-
-  /*
-     * ทำให้ Event 1 อยู่ใกล้ Timeline ที่สุด
-     */
-  flex-direction: row-reverse;
-}
-
-/*
- * ผลลัพธ์:
- *
- * Event 3 | Event 2 | Event 1 | Timeline
- *                              ↑
- *                         ใกล้ที่สุด
- */
-
-/* =========================================================
-   EVENTS - RIGHT
-   ========================================================= */
-
-.year-section.right .events {
-  /*
-     * เริ่มจาก Timeline + ช่องว่าง
-     */
-  left: calc(50vw + var(--branch-gap));
-
-  /*
-     * Event 1 อยู่ใกล้ Timeline
-     */
-  flex-direction: row;
-}
-
-/*
- * ผลลัพธ์:
- *
- * Timeline | Event 1 | Event 2 | Event 3
- *              ↑
- *         ใกล้ที่สุด
- */
 
 /* =========================================================
    EVENT CARD
    ========================================================= */
 
 .event {
+  width: 300px;
+
   flex: 0 0 300px;
 
-  background: white;
-
   padding: 15px;
+
+  background: white;
 
   border-radius: 10px;
 
@@ -292,11 +183,12 @@ body {
 }
 
 /* =========================================================
-   EVENT IMAGE
+   IMAGE
    ========================================================= */
 
 .event img {
   width: 100%;
+
   height: 280px;
 
   display: block;
@@ -307,7 +199,7 @@ body {
 }
 
 /* =========================================================
-   EVENT TITLE
+   TITLE
    ========================================================= */
 
 .event h2 {
@@ -317,7 +209,7 @@ body {
 }
 
 /* =========================================================
-   EVENT TEXT
+   TEXT
    ========================================================= */
 
 .event p {
@@ -335,23 +227,26 @@ body {
 
   top: calc(50% + 220px);
 
+  left: 50%;
+
+  transform: translateX(-50%);
+
   padding: 12px 30px;
 
   border: none;
+
   border-radius: 25px;
 
   background: #222;
+
   color: white;
 
   font-size: 16px;
 
   cursor: pointer;
 
-  z-index: 10;
+  z-index: 20;
 
-  /*
-     * ซ่อนไว้ก่อน
-     */
   opacity: 0;
 
   pointer-events: none;
@@ -359,25 +254,11 @@ body {
   transition: opacity 0.3s ease;
 }
 
-/* =========================================================
-   NEXT BUTTON - LEFT
-   ========================================================= */
-
-.year-section.left .next-button {
-  left: 40px;
-}
-
-/* =========================================================
-   NEXT BUTTON - RIGHT
-   ========================================================= */
-
-.year-section.right .next-button {
-  left: calc(50vw + var(--branch-gap) + var(--events-width) - 120px);
-}
-
-/* =========================================================
-   แสดงปุ่มเมื่อดู Events ครบ
-   ========================================================= */
+/*
+ * ตอนนี้ยังไม่เปิดการแสดงปุ่มอัตโนมัติ
+ * เพราะเราจะทำระบบ "ดูครบทุก Event"
+ * ในขั้นต่อไป
+ */
 
 .next-button.show {
   opacity: 1;
@@ -386,19 +267,13 @@ body {
 }
 
 /* =========================================================
-   NEXT BUTTON HOVER
-   ========================================================= */
-
-.next-button:hover {
-  opacity: 0.8;
-}
-
-/* =========================================================
    QUESTION
    ========================================================= */
 
 #question {
   min-height: 100vh;
+
+  width: 100vw;
 
   display: flex;
 
@@ -411,6 +286,10 @@ body {
   gap: 20px;
 
   padding: 50px;
+
+  position: relative;
+
+  z-index: 10;
 }
 
 /* =========================================================
@@ -433,6 +312,7 @@ body {
   padding: 15px;
 
   border: none;
+
   border-radius: 10px;
 
   background: white;

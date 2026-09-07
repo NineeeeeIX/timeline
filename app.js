@@ -8,13 +8,14 @@ const question = document.getElementById("question");
 const EVENT_WIDTH = 300;
 const EVENT_GAP = 30;
 const BRANCH_GAP = 80;
+const NEXT_BTN_WIDTH = 150;
 
 /* =========================================================
-   คำนวณความกว้างของ Events
+   คำนวณความกว้างของ Events รวมปุ่มถัดไป
    ========================================================= */
 
 function getEventsWidth(eventCount) {
-  return eventCount * EVENT_WIDTH + (eventCount - 1) * EVENT_GAP;
+  return eventCount * EVENT_WIDTH + NEXT_BTN_WIDTH + eventCount * EVENT_GAP;
 }
 
 /* =========================================================
@@ -25,10 +26,8 @@ const maxEventsWidth = Math.max(
   ...timelineData.map((yearData) => getEventsWidth(yearData.events.length)),
 );
 
-const worldWidth = Math.max(
-  window.innerWidth * 2,
-  maxEventsWidth + window.innerWidth + BRANCH_GAP * 2,
-);
+const outerEventDistance = BRANCH_GAP + maxEventsWidth;
+const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 150) * 2);
 
 timeline.style.width = `${worldWidth}px`;
 
@@ -54,7 +53,7 @@ timelineData.forEach((yearData, yearIndex) => {
   const branchLine = document.createElement("div");
   branchLine.className = "branch-line";
 
-  /* Events */
+  /* Events Container */
   const events = document.createElement("div");
   events.className = "events";
 
@@ -69,7 +68,7 @@ timelineData.forEach((yearData, yearIndex) => {
     events.appendChild(event);
   });
 
-  /* Next Button */
+  /* Next Button (วางไว้ต่อจากรูปภาพสุดท้าย) */
   const nextButton = document.createElement("button");
   nextButton.className = "next-button";
   nextButton.textContent =
@@ -86,18 +85,19 @@ timelineData.forEach((yearData, yearIndex) => {
       });
     } else {
       window.scrollTo({
-        left: 0,
+        left: getCenterScrollPosition(),
         top: question.offsetTop,
         behavior: "smooth",
       });
     }
   });
 
+  events.appendChild(nextButton);
+
   /* ประกอบ Section */
   yearSection.appendChild(yearBadge);
   yearSection.appendChild(branchLine);
   yearSection.appendChild(events);
-  yearSection.appendChild(nextButton);
 
   timeline.appendChild(yearSection);
 });
@@ -110,6 +110,33 @@ function getCenterScrollPosition() {
   const viewportWidth = window.innerWidth;
   return (worldWidth - viewportWidth) / 2;
 }
+
+/* =========================================================
+   เลื่อนขึ้น-ลง → ดึงแนวนอนกลับมาที่เส้น Timeline
+   เลื่อนซ้าย-ขวา → ปล่อยอิสระ
+   ========================================================= */
+
+let snapTimeout;
+
+window.addEventListener("wheel", (e) => {
+  /*
+   * ตรวจว่าผู้ใช้กำลังเลื่อนแนวตั้ง (deltaY)
+   * มากกว่าแนวนอน (deltaX) หรือไม่
+   */
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    clearTimeout(snapTimeout);
+    snapTimeout = setTimeout(() => {
+      const targetX = getCenterScrollPosition();
+      if (Math.abs(window.scrollX - targetX) > 20) {
+        window.scrollTo({
+          left: targetX,
+          top: window.scrollY,
+          behavior: "smooth",
+        });
+      }
+    }, 150);
+  }
+}, { passive: true });
 
 /* =========================================================
    เริ่มต้น

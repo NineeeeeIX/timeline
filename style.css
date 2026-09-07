@@ -38,6 +38,26 @@ body.state-finished {
   overflow: hidden;
 }
 
+/* ดูจบแล้ว → เลื่อนอิสระทุกทิศ */
+body.state-free {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+/* FREE mode → expand ทุกปีให้ดูได้หมด */
+body.state-free .year-section {
+  pointer-events: auto;
+}
+body.state-free .year-section .event,
+body.state-free .year-section .next-button {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+body.state-free .year-section .branch-line {
+  transform: translateY(-50%) scaleX(1);
+}
+
 /* =========================================================
    TIMELINE WORLD
    ========================================================= */
@@ -102,12 +122,11 @@ body.state-finished {
 }
 
 /* =========================================================
-   VIEW BUTTON (ปุ่ม "ดู" ข้างซ้ายของเลขปี)
+   VIEW BUTTON (ปุ่ม "ดู" ตามฝั่งของแต่ละปี)
    ========================================================= */
 
 .view-btn {
   position: absolute;
-  right: calc(50% + 75px);
   top: 50%;
   transform: translateY(-50%);
   z-index: 16;
@@ -123,6 +142,18 @@ body.state-finished {
   transition:
     opacity 0.4s ease,
     transform 0.2s ease;
+}
+
+/* ฝั่งซ้าย: ปุ่มดูอยู่ฝั่งซ้ายของเลขปี */
+.year-section.left .view-btn {
+  right: calc(50% + 75px);
+  left: auto;
+}
+
+/* ฝั่งขวา: ปุ่มดูอยู่ฝั่งขวาของเลขปี */
+.year-section.right .view-btn {
+  left: calc(50% + 75px);
+  right: auto;
 }
 
 .view-btn.visible {
@@ -299,7 +330,6 @@ body.state-finished {
 
 #question {
   min-height: 100vh;
-  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -372,6 +402,29 @@ body.state-finished {
 #final-overlay.show {
   display: flex;
   opacity: 1;
+}
+
+#close-overlay {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  z-index: 1001;
+}
+
+#close-overlay:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 #final-image {

@@ -43,6 +43,7 @@ const outerEventDistance = BRANCH_GAP + maxEventsWidth;
 const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 150) * 2);
 
 timeline.style.width = `${worldWidth}px`;
+questionSection.style.width = `${worldWidth}px`;
 
 /* =========================================================
    สร้าง Year Sections
@@ -67,7 +68,7 @@ timelineData.forEach((yearData, yearIndex) => {
     <div class="year-dot"></div>
   `;
 
-  /* ปุ่ม "ดู" (ข้างซ้ายของเลขปี) */
+  /* ปุ่ม "ดู" (ตามฝั่งรูปของแต่ละปี) */
   const viewBtn = document.createElement("button");
   viewBtn.className = "view-btn";
   viewBtn.textContent = "ดู";
@@ -191,7 +192,7 @@ function goToNext(index) {
     setTimeout(() => {
       setState("QUESTION");
       window.scrollTo({
-        left: 0,
+        left: (worldWidth - window.innerWidth) / 2,
         top: questionSection.offsetTop,
         behavior: "smooth",
       });
@@ -213,7 +214,6 @@ choice1.addEventListener("click", () => {
   /* แสดง overlay รูปใหญ่ */
   finalOverlay.classList.add("show");
 
-  /* fade-in ด้วย rAF เพื่อให้ transition ทำงาน */
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       finalOverlay.style.opacity = "1";
@@ -228,15 +228,38 @@ choice2.addEventListener("click", () => {
   questionFeedback.textContent = "ลองคิดอีกที 🤔";
   questionFeedback.classList.remove("shake");
 
-  /* rAF เพื่อ restart animation */
   requestAnimationFrame(() => {
     questionFeedback.classList.add("shake");
   });
 });
 
 /* =========================================================
+   ปิด Overlay → เลื่อนดูเว็ปได้อิสระ
+   ========================================================= */
+
+const closeOverlay = document.getElementById("close-overlay");
+
+closeOverlay.addEventListener("click", () => {
+  finalOverlay.classList.remove("show");
+  finalOverlay.style.opacity = "";
+
+  /* เข้า FREE mode — expand ทุกปี, เลื่อนได้อิสระ */
+  setState("FREE");
+
+  /* expand ทุก section ให้ดูได้หมด */
+  yearSections.forEach(({ section }) => {
+    section.classList.add("expanded");
+  });
+});
+
+/* =========================================================
    เริ่มต้น
    ========================================================= */
+
+/* บังคับให้ refresh กลับไปบนสุดเสมอ */
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
 
 window.addEventListener("load", () => {
   setState("VIEWING_YEAR");

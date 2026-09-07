@@ -1,93 +1,235 @@
 const timeline = document.getElementById("timeline");
 
+const EVENT_WIDTH = 300;
+const EVENT_GAP = 30;
+const BRANCH_GAP = 80;
+
+/* =========================================================
+   สร้าง Timeline
+   ========================================================= */
+
 timelineData.forEach((yearData, yearIndex) => {
+  const isLeft = yearIndex % 2 === 0;
 
-    // สร้าง section ของแต่ละปี
-    const yearSection = document.createElement("section");
-    yearSection.className = "year-section";
+  /* -----------------------------------------------------
+       Year Section
+       ----------------------------------------------------- */
 
-    // สลับซ้าย / ขวา
-    if (yearIndex % 2 === 0) {
-        yearSection.classList.add("left");
-    } else {
-        yearSection.classList.add("right");
-    }
+  const yearSection = document.createElement("section");
 
-    // เส้น Timeline
-    const timelineLine = document.createElement("div");
-    timelineLine.className = "timeline-line";
+  yearSection.className = "year-section";
 
-    // จุดและชื่อปี
-    const yearPoint = document.createElement("div");
-    yearPoint.className = "year-point";
-    yearPoint.textContent = yearData.year;
+  if (isLeft) {
+    yearSection.classList.add("left");
+  } else {
+    yearSection.classList.add("right");
+  }
 
-    // เส้นแขนที่ยื่นออกจาก Timeline
-    const branchLine = document.createElement("div");
-    branchLine.className = "branch-line";
+  /* -----------------------------------------------------
+       Canvas
+       ----------------------------------------------------- */
 
-    // Container ของเหตุการณ์
-    const events = document.createElement("div");
-    events.className = "events";
+  const canvas = document.createElement("div");
 
-    // สร้าง Event แต่ละอัน
-    yearData.events.forEach(eventData => {
+  canvas.className = "year-canvas";
 
-        const event = document.createElement("article");
-        event.className = "event";
+  /* -----------------------------------------------------
+       Timeline Line
+       ----------------------------------------------------- */
 
-        event.innerHTML = `
+  const timelineLine = document.createElement("div");
+
+  timelineLine.className = "timeline-line";
+
+  /* -----------------------------------------------------
+       Year Point
+       ----------------------------------------------------- */
+
+  const yearPoint = document.createElement("div");
+
+  yearPoint.className = "year-point";
+
+  yearPoint.innerHTML = `
+        <span>${yearData.year}</span>
+        <div class="year-dot"></div>
+    `;
+
+  /* -----------------------------------------------------
+       Branch Line
+       ----------------------------------------------------- */
+
+  const branchLine = document.createElement("div");
+
+  branchLine.className = "branch-line";
+
+  /* -----------------------------------------------------
+       Events
+       ----------------------------------------------------- */
+
+  const events = document.createElement("div");
+
+  events.className = "events";
+
+  yearData.events.forEach((eventData) => {
+    const event = document.createElement("article");
+
+    event.className = "event";
+
+    event.innerHTML = `
             <img src="${eventData.image}" alt="${eventData.title}">
+
             <h2>${eventData.title}</h2>
+
             <p>${eventData.text}</p>
         `;
 
-        events.appendChild(event);
-    });
+    events.appendChild(event);
+  });
 
-    // ปุ่มต่อไป
-    const nextButton = document.createElement("button");
-    nextButton.className = "next-button";
+  /* -----------------------------------------------------
+       คำนวณความกว้างของ Events
+       ----------------------------------------------------- */
+
+  const eventCount = yearData.events.length;
+
+  const eventsWidth = eventCount * EVENT_WIDTH + (eventCount - 1) * EVENT_GAP;
+
+  yearSection.dataset.eventsWidth = eventsWidth;
+
+  /* -----------------------------------------------------
+       กำหนดความกว้างให้ Canvas
+       ----------------------------------------------------- */
+
+  const canvasWidth = window.innerWidth / 2 + BRANCH_GAP + eventsWidth;
+
+  canvas.style.width = `${canvasWidth}px`;
+
+  canvas.style.setProperty("--events-width", `${eventsWidth}px`);
+
+  canvas.style.setProperty("--branch-gap", `${BRANCH_GAP}px`);
+
+  /* -----------------------------------------------------
+       Next Button
+       ----------------------------------------------------- */
+
+  const nextButton = document.createElement("button");
+
+  nextButton.className = "next-button";
+
+  if (yearIndex === timelineData.length - 1) {
+    nextButton.textContent = "ไปที่คำถาม";
+  } else {
     nextButton.textContent = "ต่อไป";
+  }
 
-    // ถ้าเป็นปีสุดท้าย ให้เปลี่ยนข้อความ
-    if (yearIndex === timelineData.length - 1) {
-        nextButton.textContent = "ไปที่คำถาม";
-    }
+  /* -----------------------------------------------------
+       ประกอบ Events
+       ----------------------------------------------------- */
 
-    // เมื่อกดปุ่ม
-    nextButton.addEventListener("click", () => {
+  canvas.appendChild(timelineLine);
 
-        if (yearIndex < timelineData.length - 1) {
+  canvas.appendChild(yearPoint);
 
-            const nextSection =
-                timeline.children[yearIndex + 1];
+  canvas.appendChild(branchLine);
 
-            nextSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+  canvas.appendChild(events);
 
-        } else {
+  canvas.appendChild(nextButton);
 
-            const question =
-                document.getElementById("question");
+  yearSection.appendChild(canvas);
 
-            question.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-            });
+  timeline.appendChild(yearSection);
 
-        }
+  /* -----------------------------------------------------
+       ตั้งตำแหน่งเริ่มต้นของการ Scroll
+       ----------------------------------------------------- */
 
+  if (isLeft) {
+    requestAnimationFrame(() => {
+      yearSection.scrollLeft =
+        yearSection.scrollWidth - yearSection.clientWidth;
     });
+  } else {
+    yearSection.scrollLeft = 0;
+  }
 
-    // ประกอบทุกอย่างเข้าด้วยกัน
-    yearSection.appendChild(timelineLine);
-    yearSection.appendChild(branchLine);
-    yearSection.appendChild(yearPoint);
-    yearSection.appendChild(events);
-    yearSection.appendChild(nextButton);
+  /* -----------------------------------------------------
+       ตรวจว่าดู Events ครบหรือยัง
+       ----------------------------------------------------- */
 
-    timeline.appendChild(yearSection);
+  function checkScrollEnd() {
+    const scrollLeft = yearSection.scrollLeft;
+
+    const maxScroll = yearSection.scrollWidth - yearSection.clientWidth;
+
+    /*
+     * ฝั่งซ้าย
+     *
+     * ต้อง scroll ไปจนสุดซ้าย
+     */
+
+    if (isLeft) {
+      if (scrollLeft <= 5) {
+        nextButton.classList.add("show");
+      } else {
+        nextButton.classList.remove("show");
+      }
+    } else {
+      /*
+       * ฝั่งขวา
+       *
+       * ต้อง scroll ไปจนสุดขวา
+       */
+      if (scrollLeft >= maxScroll - 5) {
+        nextButton.classList.add("show");
+      } else {
+        nextButton.classList.remove("show");
+      }
+    }
+  }
+
+  yearSection.addEventListener("scroll", checkScrollEnd);
+
+  /* -----------------------------------------------------
+       ปุ่ม Next
+       ----------------------------------------------------- */
+
+  nextButton.addEventListener("click", () => {
+    if (yearIndex < timelineData.length - 1) {
+      const nextSection = timeline.children[yearIndex + 1];
+
+      const nextYearIsLeft = (yearIndex + 1) % 2 === 0;
+
+      const nextEventsWidth = Number(nextSection.dataset.eventsWidth);
+
+      /* กลับไปโฟกัส Timeline */
+
+      if (nextYearIsLeft) {
+        nextSection.scrollLeft =
+          nextSection.scrollWidth - nextSection.clientWidth;
+      } else {
+        nextSection.scrollLeft = 0;
+      }
+
+      /* เลื่อนลงไปปีถัดไป */
+
+      nextSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      const question = document.getElementById("question");
+
+      question.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  });
+
+  /* -----------------------------------------------------
+       ตรวจครั้งแรก
+       ----------------------------------------------------- */
+
+  checkScrollEnd();
 });

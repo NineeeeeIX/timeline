@@ -1,4 +1,5 @@
 const timeline = document.getElementById("timeline");
+const timelineTrack = document.getElementById("timeline-track");
 const questionSection = document.getElementById("question");
 const questionFeedback = document.getElementById("question-feedback");
 const choice1 = document.getElementById("choice-1");
@@ -58,6 +59,7 @@ const maxEventsWidth = Math.max(
 const outerEventDistance = config.branchGap + maxEventsWidth;
 const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 100) * 2);
 
+timelineTrack.style.width = `${worldWidth}px`;
 timeline.style.width = `${worldWidth}px`;
 questionSection.style.width = `${worldWidth}px`;
 
@@ -148,18 +150,22 @@ function showYear(index) {
   currentYearIndex = index;
   setState("VIEWING_YEAR");
 
-  const { section, viewBtn } = yearSections[index];
+  const { viewBtn } = yearSections[index];
 
+  /* เลื่อน track แนวตั้งด้วย GPU transform */
+  timelineTrack.style.transform = `translateY(-${index * 100}vh)`;
+
+  /* โฟกัสแนวนอนที่เส้น Timeline */
   wrapper.scrollTo({
     left: getCenterScrollPosition(),
-    top: section.offsetTop,
+    top: 0,
     behavior: "smooth",
   });
 
   /* แสดงปุ่ม "ดู" หลัง scroll เสร็จ */
   setTimeout(() => {
     viewBtn.classList.add("visible");
-  }, 700);
+  }, 600);
 }
 
 /* =========================================================
@@ -191,14 +197,16 @@ function expandYear(index) {
   );
 
   setTimeout(() => {
-    wrapper.scrollTo({
-      left: isLeft
-        ? getCenterScrollPosition() - nudge
-        : getCenterScrollPosition() + nudge,
-      top: section.offsetTop,
-      behavior: "smooth",
-    });
-  }, 500);
+    if (state === "EXPLORING") {
+      wrapper.scrollTo({
+        left: isLeft
+          ? getCenterScrollPosition() - nudge
+          : getCenterScrollPosition() + nudge,
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, 250);
 }
 
 /* =========================================================
@@ -219,17 +227,18 @@ function goToNext(index) {
 
   if (index < timelineData.length - 1) {
     /* ไปปีถัดไป */
-    setTimeout(() => showYear(index + 1), 500);
+    setTimeout(() => showYear(index + 1), 400);
   } else {
     /* ปีสุดท้าย → ไปคำถาม */
     setTimeout(() => {
       setState("QUESTION");
+      timelineTrack.style.transform = `translateY(-${timelineData.length * 100}vh)`;
       wrapper.scrollTo({
         left: getCenterScrollPosition(),
-        top: questionSection.offsetTop,
+        top: 0,
         behavior: "smooth",
       });
-    }, 500);
+    }, 400);
   }
 }
 
@@ -279,9 +288,18 @@ closeOverlay.addEventListener("click", () => {
   /* เข้า FREE mode — expand ทุกปี, เลื่อนได้อิสระ */
   setState("FREE");
 
+  timelineTrack.style.transition = "none";
+  timelineTrack.style.transform = "none";
+
   /* expand ทุก section ให้ดูได้หมด */
   yearSections.forEach(({ section }) => {
     section.classList.add("expanded");
+  });
+
+  wrapper.scrollTo({
+    left: getCenterScrollPosition(),
+    top: questionSection.offsetTop,
+    behavior: "instant",
   });
 });
 
@@ -296,6 +314,7 @@ if ("scrollRestoration" in history) {
 
 window.addEventListener("load", () => {
   setState("VIEWING_YEAR");
+  timelineTrack.style.transform = "translateY(0px)";
 
   wrapper.scrollTo({
     left: getCenterScrollPosition(),
@@ -307,4 +326,14 @@ window.addEventListener("load", () => {
   setTimeout(() => {
     yearSections[0].viewBtn.classList.add("visible");
   }, 600);
+});
+
+window.addEventListener("resize", () => {
+  if (state === "VIEWING_YEAR" || state === "QUESTION") {
+    wrapper.scrollTo({
+      left: getCenterScrollPosition(),
+      top: 0,
+      behavior: "instant",
+    });
+  }
 });

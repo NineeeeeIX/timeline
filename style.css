@@ -6,24 +6,42 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   font-family: Arial, sans-serif;
   background: #f5f5f5;
   color: #222;
   overflow: hidden;
+  position: fixed;
+  touch-action: none;
 }
 
 /* =========================================================
-   VIEWPORT WRAPPER — ควบคุม Scroll แทน body
+   VIEWPORT WRAPPER — ควบคุม Scroll แนวนอนแทน body
    ========================================================= */
 
 #viewport-wrapper {
   width: 100vw;
   height: 100vh;
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* =========================================================
+   TIMELINE TRACK — เลื่อนแนวตั้งตามปีด้วย GPU transform
+   ========================================================= */
+
+#timeline-track {
+  position: relative;
+  width: 100%;
+  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
 }
 
 /* =========================================================
@@ -33,27 +51,41 @@ body {
 /* โฟกัสที่เส้น Timeline → ล็อกทุกทิศ */
 body.state-viewing-year #viewport-wrapper {
   overflow: hidden;
+  touch-action: none;
 }
 
 /* กระจายรูปแล้ว → เลื่อนซ้าย-ขวาได้อย่างเดียว */
 body.state-exploring #viewport-wrapper {
   overflow-x: auto;
   overflow-y: hidden;
+  touch-action: pan-x;
 }
 
 /* คำถาม → ล็อกทุกทิศ */
 body.state-question #viewport-wrapper {
   overflow: hidden;
+  touch-action: none;
 }
 
 /* จบ → ล็อกทุกทิศ (แสดง overlay) */
 body.state-finished #viewport-wrapper {
   overflow: hidden;
+  touch-action: none;
 }
 
 /* ดูจบแล้ว → เลื่อนอิสระทุกทิศ */
+body.state-free,
+body.state-free html {
+  position: static;
+  touch-action: auto;
+}
 body.state-free #viewport-wrapper {
   overflow: auto;
+  touch-action: auto;
+}
+body.state-free #timeline-track {
+  transition: none;
+  transform: none !important;
 }
 
 /* FREE mode → expand ทุกปีให้ดูได้หมด */
@@ -249,6 +281,9 @@ body.state-free .year-section .branch-line {
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 
   /* เริ่มต้น: ซ่อนไว้ที่จุดศูนย์กลาง */
   opacity: 0;
@@ -277,6 +312,11 @@ body.state-free .year-section .branch-line {
   object-fit: cover;
   border-radius: 6px;
   background: #ddd;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
 }
 
 /* =========================================================

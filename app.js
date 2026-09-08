@@ -14,13 +14,18 @@ const EVENT_GAP = 30;
 const BRANCH_GAP = 80;
 const NEXT_BTN_WIDTH = 180;
 const MOBILE_BREAKPOINT = 768;
+const TABLET_BREAKPOINT = 1024;
 
 /* =========================================================
-   MOBILE DETECTION
+   SCREEN SIZE DETECTION
    ========================================================= */
 
 function isMobile() {
   return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
+function isSmallScreen() {
+  return window.innerWidth <= TABLET_BREAKPOINT;
 }
 
 /* =========================================================
@@ -46,7 +51,7 @@ function getEventsWidth(eventCount) {
 
 let worldWidth = window.innerWidth;
 
-if (!isMobile()) {
+if (!isSmallScreen()) {
   const maxEventsWidth = Math.max(
     ...timelineData.map((d) => getEventsWidth(d.events.length)),
   );
@@ -68,7 +73,7 @@ timelineData.forEach((yearData, yearIndex) => {
   const yearSection = document.createElement("section");
   yearSection.className = "year-section";
 
-  if (!isMobile()) {
+  if (!isSmallScreen()) {
     yearSection.style.width = `${worldWidth}px`;
   }
 
@@ -137,7 +142,7 @@ timelineData.forEach((yearData, yearIndex) => {
    ========================================================= */
 
 function getCenterScrollPosition() {
-  if (isMobile()) return 0;
+  if (isSmallScreen()) return 0;
   return (worldWidth - window.innerWidth) / 2;
 }
 

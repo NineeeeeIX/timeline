@@ -465,27 +465,125 @@ body.state-free .year-section .branch-line {
 }
 
 /* =========================================================
-   RESPONSIVE — Tablet (≤ 1024px)
+   RESPONSIVE — Tablet only (769px – 1024px)
+   คงเลย์เอาท์ซ้าย-ขวาเหมือน PC แต่ย่อขนาดให้พอดี iPad
    ========================================================= */
 
-@media (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  /* --- Body States --- */
+  body.state-viewing-year {
+    overflow: hidden;
+  }
+
+  body.state-exploring {
+    overflow: hidden;
+  }
+
+  /* --- Timeline World --- */
+  #timeline {
+    width: 100vw !important;
+    min-width: unset;
+  }
+
+  /* --- Year Section --- */
+  .year-section {
+    width: 100vw !important;
+  }
+
+  /* --- Year Badge --- */
+  .year-badge {
+    width: 100px;
+    height: 68px;
+    font-size: 24px;
+  }
+
+  /* --- View Button --- */
+  .year-section.left .view-btn {
+    right: calc(50% + 56px);
+  }
+
+  .year-section.right .view-btn {
+    left: calc(50% + 56px);
+  }
+
+  .view-btn {
+    padding: 8px 22px;
+    font-size: 14px;
+  }
+
+  /* --- Branch Line ย่อสั้นลง --- */
+  .branch-line {
+    width: 40px;
+  }
+
+  /* --- Events Container — ย่อตำแหน่ง + scroll แนวนอน --- */
+  .year-section.left .events {
+    right: calc(50% + 40px);
+  }
+
+  .year-section.right .events {
+    left: calc(50% + 40px);
+  }
+
+  .events {
+    max-width: calc(50% - 50px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 20px;
+    padding: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* --- Event Card --- */
   .event {
-    width: 240px;
-    flex: 0 0 240px;
+    width: 200px;
+    flex: 0 0 200px;
+    scroll-snap-align: start;
   }
 
   .event img {
-    height: 200px;
+    height: 180px;
   }
 
   .event h2 {
-    font-size: 17px;
+    font-size: 16px;
+    margin: 10px 0 6px;
   }
 
   .event p {
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* --- Next Button --- */
+  .next-button {
+    padding: 12px 24px;
+    font-size: 15px;
+    scroll-snap-align: start;
+  }
+
+  /* --- Question Section --- */
+  #question {
+    width: 100vw !important;
+  }
+
+  #question-text {
+    font-size: 28px;
+  }
+
+  #question button {
+    width: 240px;
+    font-size: 16px;
+  }
+
+  /* --- Final Overlay --- */
+  #final-image {
+    max-width: 85vw;
+    max-height: 75vh;
   }
 }
+
 
 /* =========================================================
    RESPONSIVE — Mobile (≤ 768px)

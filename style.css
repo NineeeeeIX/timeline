@@ -11,37 +11,49 @@ body {
   font-family: Arial, sans-serif;
   background: #f5f5f5;
   color: #222;
+  overflow: hidden;
 }
 
 /* =========================================================
-   BODY STATES — ควบคุม Scroll ตาม State
+   VIEWPORT WRAPPER — ควบคุม Scroll แทน body
+   ========================================================= */
+
+#viewport-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================
+   WRAPPER STATES — ควบคุม Scroll ตาม State
    ========================================================= */
 
 /* โฟกัสที่เส้น Timeline → ล็อกทุกทิศ */
-body.state-viewing-year {
+body.state-viewing-year #viewport-wrapper {
   overflow: hidden;
 }
 
 /* กระจายรูปแล้ว → เลื่อนซ้าย-ขวาได้อย่างเดียว */
-body.state-exploring {
+body.state-exploring #viewport-wrapper {
   overflow-x: auto;
   overflow-y: hidden;
 }
 
 /* คำถาม → ล็อกทุกทิศ */
-body.state-question {
+body.state-question #viewport-wrapper {
   overflow: hidden;
 }
 
 /* จบ → ล็อกทุกทิศ (แสดง overlay) */
-body.state-finished {
+body.state-finished #viewport-wrapper {
   overflow: hidden;
 }
 
 /* ดูจบแล้ว → เลื่อนอิสระทุกทิศ */
-body.state-free {
-  overflow-x: auto;
-  overflow-y: auto;
+body.state-free #viewport-wrapper {
+  overflow: auto;
 }
 
 /* FREE mode → expand ทุกปีให้ดูได้หมด */
@@ -465,40 +477,27 @@ body.state-free .year-section .branch-line {
 }
 
 /* =========================================================
-   RESPONSIVE — Tablet only (769px – 1024px)
-   คงเลย์เอาท์ซ้าย-ขวาเหมือน PC แต่ย่อขนาดให้พอดี iPad
+   RESPONSIVE — Tablet (≤ 1024px)
+   ปรับขนาดให้เล็กลง แต่คง layout ซ้าย-ขวาเหมือน PC
    ========================================================= */
 
-@media (min-width: 769px) and (max-width: 1024px) {
-
-  /* --- Body States --- */
-  body.state-viewing-year {
-    overflow: hidden;
-  }
-
-  body.state-exploring {
-    overflow: hidden;
-  }
-
-  /* --- Timeline World --- */
-  #timeline {
-    width: 100vw !important;
-    min-width: unset;
-  }
-
-  /* --- Year Section --- */
-  .year-section {
-    width: 100vw !important;
-  }
-
-  /* --- Year Badge --- */
+@media (max-width: 1024px) {
   .year-badge {
     width: 100px;
     height: 68px;
     font-size: 24px;
   }
 
-  /* --- View Button --- */
+  .year-dot {
+    width: 15px;
+    height: 15px;
+  }
+
+  .view-btn {
+    padding: 8px 22px;
+    font-size: 14px;
+  }
+
   .year-section.left .view-btn {
     right: calc(50% + 56px);
   }
@@ -507,17 +506,10 @@ body.state-free .year-section .branch-line {
     left: calc(50% + 56px);
   }
 
-  .view-btn {
-    padding: 8px 22px;
-    font-size: 14px;
-  }
-
-  /* --- Branch Line ย่อสั้นลง --- */
   .branch-line {
     width: 40px;
   }
 
-  /* --- Events Container — ย่อตำแหน่ง + scroll แนวนอน --- */
   .year-section.left .events {
     right: calc(50% + 40px);
   }
@@ -527,19 +519,12 @@ body.state-free .year-section .branch-line {
   }
 
   .events {
-    max-width: calc(50% - 50px);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     gap: 20px;
-    padding: 8px;
-    scroll-snap-type: x mandatory;
   }
 
-  /* --- Event Card --- */
   .event {
     width: 200px;
     flex: 0 0 200px;
-    scroll-snap-align: start;
   }
 
   .event img {
@@ -556,16 +541,9 @@ body.state-free .year-section .branch-line {
     line-height: 1.5;
   }
 
-  /* --- Next Button --- */
   .next-button {
     padding: 12px 24px;
     font-size: 15px;
-    scroll-snap-align: start;
-  }
-
-  /* --- Question Section --- */
-  #question {
-    width: 100vw !important;
   }
 
   #question-text {
@@ -577,169 +555,90 @@ body.state-free .year-section .branch-line {
     font-size: 16px;
   }
 
-  /* --- Final Overlay --- */
   #final-image {
     max-width: 85vw;
     max-height: 75vh;
   }
 }
 
-
 /* =========================================================
    RESPONSIVE — Mobile (≤ 768px)
    ========================================================= */
 
 @media (max-width: 768px) {
-
-  /* --- Body States Override --- */
-  body.state-viewing-year {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  body.state-exploring {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  body.state-question {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  body.state-finished {
-    overflow-x: hidden;
-  }
-
-  body.state-free {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  /* --- Timeline World --- */
-  #timeline {
-    width: 100vw !important;
-    min-width: unset;
-  }
-
-  /* --- Timeline Line → ซ่อนเส้นแนวตั้งกลาง บนมือถือ --- */
   #timeline-line {
-    left: 24px;
-    transform: none;
     width: 3px;
   }
 
-  /* --- Year Section --- */
-  .year-section {
-    width: 100vw !important;
-    height: auto !important;
-    min-height: auto;
-    padding: 30px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  /* --- Year Badge --- */
   .year-badge {
-    position: relative;
-    left: 0;
-    top: 0;
-    transform: none;
-    margin-left: 10px;
-    width: auto;
-    height: auto;
-    flex-direction: row;
-    gap: 10px;
-    font-size: 22px;
-    background: #f5f5f5;
-    padding: 8px 16px;
-    z-index: 15;
+    width: 80px;
+    height: 56px;
+    font-size: 20px;
   }
 
   .year-dot {
-    width: 14px;
-    height: 14px;
-    margin-top: 0;
+    width: 12px;
+    height: 12px;
+    margin-top: 5px;
   }
 
-  /* --- View Button --- */
   .view-btn {
-    position: relative;
-    top: auto;
-    left: auto !important;
-    right: auto !important;
-    transform: none;
-    margin: 12px 0 0 52px;
-    padding: 8px 24px;
-    font-size: 14px;
+    padding: 6px 18px;
+    font-size: 13px;
+    border-radius: 20px;
   }
 
-  .view-btn.visible {
-    opacity: 1;
-    pointer-events: auto;
+  .year-section.left .view-btn {
+    right: calc(50% + 46px);
   }
 
-  .view-btn:hover {
-    transform: scale(1.05);
+  .year-section.right .view-btn {
+    left: calc(50% + 46px);
   }
 
-  /* --- Branch Line → ซ่อน --- */
   .branch-line {
-    display: none;
+    width: 30px;
+    height: 2px;
   }
 
-  /* --- Events Container → Vertical Stack --- */
+  .year-section.left .events {
+    right: calc(50% + 30px);
+  }
+
+  .year-section.right .events {
+    left: calc(50% + 30px);
+  }
+
   .events {
-    position: relative;
-    top: auto;
-    left: auto !important;
-    right: auto !important;
-    transform: none;
-    flex-direction: column !important;
-    align-items: stretch;
-    width: 100% !important;
-    padding: 16px 16px 16px 52px;
     gap: 16px;
   }
 
-  /* --- Event Card --- */
   .event {
-    width: 100%;
-    flex: 0 0 auto;
-    max-width: 100%;
+    width: 160px;
+    flex: 0 0 160px;
+    padding: 10px;
   }
 
   .event img {
-    height: 200px;
+    height: 140px;
   }
 
   .event h2 {
-    font-size: 17px;
-    margin: 10px 0 6px;
+    font-size: 14px;
+    margin: 8px 0 4px;
   }
 
   .event p {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
   }
 
-  /* --- Next Button --- */
   .next-button {
-    align-self: center;
-    width: calc(100% - 20px);
-    padding: 14px 24px;
-    font-size: 16px;
+    padding: 10px 20px;
+    font-size: 14px;
   }
 
-  .next-button:hover {
-    transform: none;
-  }
-
-  /* --- Question Section --- */
   #question {
-    width: 100vw !important;
-    min-height: 100vh;
     padding: 40px 20px;
   }
 
@@ -753,13 +652,11 @@ body.state-free .year-section .branch-line {
   }
 
   #question button {
-    width: 100%;
-    max-width: 300px;
-    padding: 14px;
-    font-size: 16px;
+    width: 220px;
+    padding: 12px;
+    font-size: 15px;
   }
 
-  /* --- Final Overlay --- */
   #final-image {
     max-width: 92vw;
     max-height: 70vh;
@@ -782,21 +679,70 @@ body.state-free .year-section .branch-line {
 
 @media (max-width: 400px) {
   .year-badge {
-    font-size: 18px;
-    margin-left: 6px;
-    padding: 6px 12px;
+    width: 66px;
+    height: 48px;
+    font-size: 17px;
   }
 
-  .events {
-    padding: 12px 12px 12px 44px;
-    gap: 12px;
+  .year-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .view-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+  }
+
+  .year-section.left .view-btn {
+    right: calc(50% + 38px);
+  }
+
+  .year-section.right .view-btn {
+    left: calc(50% + 38px);
+  }
+
+  .branch-line {
+    width: 24px;
+  }
+
+  .year-section.left .events {
+    right: calc(50% + 24px);
+  }
+
+  .year-section.right .events {
+    left: calc(50% + 24px);
+  }
+
+  .event {
+    width: 130px;
+    flex: 0 0 130px;
+    padding: 8px;
   }
 
   .event img {
-    height: 160px;
+    height: 110px;
+  }
+
+  .event h2 {
+    font-size: 13px;
+  }
+
+  .event p {
+    font-size: 11px;
+  }
+
+  .next-button {
+    padding: 8px 16px;
+    font-size: 13px;
   }
 
   #question-text {
     font-size: 19px;
+  }
+
+  #question button {
+    width: 180px;
+    font-size: 14px;
   }
 }

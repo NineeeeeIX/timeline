@@ -4,29 +4,27 @@ const questionFeedback = document.getElementById("question-feedback");
 const choice1 = document.getElementById("choice-1");
 const choice2 = document.getElementById("choice-2");
 const finalOverlay = document.getElementById("final-overlay");
+const wrapper = document.getElementById("viewport-wrapper");
 
 /* =========================================================
-   CONFIG
+   RESPONSIVE CONFIG
    ========================================================= */
 
-const EVENT_WIDTH = 300;
-const EVENT_GAP = 30;
-const BRANCH_GAP = 80;
-const NEXT_BTN_WIDTH = 180;
-const MOBILE_BREAKPOINT = 768;
-const TABLET_BREAKPOINT = 1024;
-
-/* =========================================================
-   SCREEN SIZE DETECTION
-   ========================================================= */
-
-function isMobile() {
-  return window.innerWidth <= MOBILE_BREAKPOINT;
+function getResponsiveConfig() {
+  const w = window.innerWidth;
+  if (w <= 400) {
+    return { eventWidth: 130, eventGap: 16, branchGap: 24, nextBtnWidth: 100 };
+  }
+  if (w <= 768) {
+    return { eventWidth: 160, eventGap: 16, branchGap: 30, nextBtnWidth: 120 };
+  }
+  if (w <= 1024) {
+    return { eventWidth: 200, eventGap: 20, branchGap: 40, nextBtnWidth: 150 };
+  }
+  return { eventWidth: 300, eventGap: 30, branchGap: 80, nextBtnWidth: 180 };
 }
 
-function isSmallScreen() {
-  return window.innerWidth <= TABLET_BREAKPOINT;
-}
+const config = getResponsiveConfig();
 
 /* =========================================================
    STATE
@@ -42,26 +40,26 @@ function setState(newState) {
 }
 
 /* =========================================================
-   คำนวณความกว้าง (Desktop only)
+   คำนวณความกว้าง
    ========================================================= */
 
 function getEventsWidth(eventCount) {
-  return eventCount * EVENT_WIDTH + NEXT_BTN_WIDTH + eventCount * EVENT_GAP;
-}
-
-let worldWidth = window.innerWidth;
-
-if (!isSmallScreen()) {
-  const maxEventsWidth = Math.max(
-    ...timelineData.map((d) => getEventsWidth(d.events.length)),
+  return (
+    eventCount * config.eventWidth +
+    config.nextBtnWidth +
+    eventCount * config.eventGap
   );
-
-  const outerEventDistance = BRANCH_GAP + maxEventsWidth;
-  worldWidth = Math.max(window.innerWidth, (outerEventDistance + 150) * 2);
-
-  timeline.style.width = `${worldWidth}px`;
-  questionSection.style.width = `${worldWidth}px`;
 }
+
+const maxEventsWidth = Math.max(
+  ...timelineData.map((d) => getEventsWidth(d.events.length)),
+);
+
+const outerEventDistance = config.branchGap + maxEventsWidth;
+const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 100) * 2);
+
+timeline.style.width = `${worldWidth}px`;
+questionSection.style.width = `${worldWidth}px`;
 
 /* =========================================================
    สร้าง Year Sections
@@ -72,10 +70,7 @@ const yearSections = [];
 timelineData.forEach((yearData, yearIndex) => {
   const yearSection = document.createElement("section");
   yearSection.className = "year-section";
-
-  if (!isSmallScreen()) {
-    yearSection.style.width = `${worldWidth}px`;
-  }
+  yearSection.style.width = `${worldWidth}px`;
 
   /* สลับซ้าย / ขวา */
   const isLeft = yearIndex % 2 === 0;
@@ -142,7 +137,6 @@ timelineData.forEach((yearData, yearIndex) => {
    ========================================================= */
 
 function getCenterScrollPosition() {
-  if (isSmallScreen()) return 0;
   return (worldWidth - window.innerWidth) / 2;
 }
 
@@ -156,7 +150,7 @@ function showYear(index) {
 
   const { section, viewBtn } = yearSections[index];
 
-  window.scrollTo({
+  wrapper.scrollTo({
     left: getCenterScrollPosition(),
     top: section.offsetTop,
     behavior: "smooth",
@@ -189,12 +183,22 @@ function expandYear(index) {
     children[i].style.transitionDelay = `${i * 0.12}s`;
   }
 
-  /* บน Mobile: scroll ลงไปให้เห็น events หลัง expand */
-  if (isMobile()) {
-    setTimeout(() => {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 150);
-  }
+  /* Nudge scroll ไปทางที่มี events เพื่อให้เห็นการ์ดแรก */
+  const isLeft = section.classList.contains("left");
+  const nudge = Math.min(
+    config.eventWidth + config.branchGap,
+    window.innerWidth * 0.35,
+  );
+
+  setTimeout(() => {
+    wrapper.scrollTo({
+      left: isLeft
+        ? getCenterScrollPosition() - nudge
+        : getCenterScrollPosition() + nudge,
+      top: section.offsetTop,
+      behavior: "smooth",
+    });
+  }, 500);
 }
 
 /* =========================================================
@@ -220,7 +224,7 @@ function goToNext(index) {
     /* ปีสุดท้าย → ไปคำถาม */
     setTimeout(() => {
       setState("QUESTION");
-      window.scrollTo({
+      wrapper.scrollTo({
         left: getCenterScrollPosition(),
         top: questionSection.offsetTop,
         behavior: "smooth",
@@ -293,7 +297,7 @@ if ("scrollRestoration" in history) {
 window.addEventListener("load", () => {
   setState("VIEWING_YEAR");
 
-  window.scrollTo({
+  wrapper.scrollTo({
     left: getCenterScrollPosition(),
     top: 0,
     behavior: "instant",

@@ -13,6 +13,15 @@ const EVENT_WIDTH = 300;
 const EVENT_GAP = 30;
 const BRANCH_GAP = 80;
 const NEXT_BTN_WIDTH = 180;
+const MOBILE_BREAKPOINT = 768;
+
+/* =========================================================
+   MOBILE DETECTION
+   ========================================================= */
+
+function isMobile() {
+  return window.innerWidth <= MOBILE_BREAKPOINT;
+}
 
 /* =========================================================
    STATE
@@ -28,22 +37,26 @@ function setState(newState) {
 }
 
 /* =========================================================
-   คำนวณความกว้าง
+   คำนวณความกว้าง (Desktop only)
    ========================================================= */
 
 function getEventsWidth(eventCount) {
   return eventCount * EVENT_WIDTH + NEXT_BTN_WIDTH + eventCount * EVENT_GAP;
 }
 
-const maxEventsWidth = Math.max(
-  ...timelineData.map((d) => getEventsWidth(d.events.length)),
-);
+let worldWidth = window.innerWidth;
 
-const outerEventDistance = BRANCH_GAP + maxEventsWidth;
-const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 150) * 2);
+if (!isMobile()) {
+  const maxEventsWidth = Math.max(
+    ...timelineData.map((d) => getEventsWidth(d.events.length)),
+  );
 
-timeline.style.width = `${worldWidth}px`;
-questionSection.style.width = `${worldWidth}px`;
+  const outerEventDistance = BRANCH_GAP + maxEventsWidth;
+  worldWidth = Math.max(window.innerWidth, (outerEventDistance + 150) * 2);
+
+  timeline.style.width = `${worldWidth}px`;
+  questionSection.style.width = `${worldWidth}px`;
+}
 
 /* =========================================================
    สร้าง Year Sections
@@ -54,7 +67,10 @@ const yearSections = [];
 timelineData.forEach((yearData, yearIndex) => {
   const yearSection = document.createElement("section");
   yearSection.className = "year-section";
-  yearSection.style.width = `${worldWidth}px`;
+
+  if (!isMobile()) {
+    yearSection.style.width = `${worldWidth}px`;
+  }
 
   /* สลับซ้าย / ขวา */
   const isLeft = yearIndex % 2 === 0;
@@ -121,6 +137,7 @@ timelineData.forEach((yearData, yearIndex) => {
    ========================================================= */
 
 function getCenterScrollPosition() {
+  if (isMobile()) return 0;
   return (worldWidth - window.innerWidth) / 2;
 }
 
@@ -166,6 +183,13 @@ function expandYear(index) {
   for (let i = 0; i < children.length; i++) {
     children[i].style.transitionDelay = `${i * 0.12}s`;
   }
+
+  /* บน Mobile: scroll ลงไปให้เห็น events หลัง expand */
+  if (isMobile()) {
+    setTimeout(() => {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  }
 }
 
 /* =========================================================
@@ -192,7 +216,7 @@ function goToNext(index) {
     setTimeout(() => {
       setState("QUESTION");
       window.scrollTo({
-        left: (worldWidth - window.innerWidth) / 2,
+        left: getCenterScrollPosition(),
         top: questionSection.offsetTop,
         behavior: "smooth",
       });

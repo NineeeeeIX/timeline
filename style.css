@@ -463,3 +463,242 @@ body.state-free .year-section .branch-line {
 .shake {
   animation: shake 0.4s ease;
 }
+
+/* =========================================================
+   RESPONSIVE — Tablet (≤ 1024px)
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .event {
+    width: 240px;
+    flex: 0 0 240px;
+  }
+
+  .event img {
+    height: 200px;
+  }
+
+  .event h2 {
+    font-size: 17px;
+  }
+
+  .event p {
+    font-size: 14px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — Mobile (≤ 768px)
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* --- Body States Override --- */
+  body.state-viewing-year {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body.state-exploring {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body.state-question {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body.state-finished {
+    overflow-x: hidden;
+  }
+
+  body.state-free {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* --- Timeline World --- */
+  #timeline {
+    width: 100vw !important;
+    min-width: unset;
+  }
+
+  /* --- Timeline Line → ซ่อนเส้นแนวตั้งกลาง บนมือถือ --- */
+  #timeline-line {
+    left: 24px;
+    transform: none;
+    width: 3px;
+  }
+
+  /* --- Year Section --- */
+  .year-section {
+    width: 100vw !important;
+    height: auto !important;
+    min-height: auto;
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* --- Year Badge --- */
+  .year-badge {
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    margin-left: 10px;
+    width: auto;
+    height: auto;
+    flex-direction: row;
+    gap: 10px;
+    font-size: 22px;
+    background: #f5f5f5;
+    padding: 8px 16px;
+    z-index: 15;
+  }
+
+  .year-dot {
+    width: 14px;
+    height: 14px;
+    margin-top: 0;
+  }
+
+  /* --- View Button --- */
+  .view-btn {
+    position: relative;
+    top: auto;
+    left: auto !important;
+    right: auto !important;
+    transform: none;
+    margin: 12px 0 0 52px;
+    padding: 8px 24px;
+    font-size: 14px;
+  }
+
+  .view-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .view-btn:hover {
+    transform: scale(1.05);
+  }
+
+  /* --- Branch Line → ซ่อน --- */
+  .branch-line {
+    display: none;
+  }
+
+  /* --- Events Container → Vertical Stack --- */
+  .events {
+    position: relative;
+    top: auto;
+    left: auto !important;
+    right: auto !important;
+    transform: none;
+    flex-direction: column !important;
+    align-items: stretch;
+    width: 100% !important;
+    padding: 16px 16px 16px 52px;
+    gap: 16px;
+  }
+
+  /* --- Event Card --- */
+  .event {
+    width: 100%;
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .event img {
+    height: 200px;
+  }
+
+  .event h2 {
+    font-size: 17px;
+    margin: 10px 0 6px;
+  }
+
+  .event p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* --- Next Button --- */
+  .next-button {
+    align-self: center;
+    width: calc(100% - 20px);
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+
+  .next-button:hover {
+    transform: none;
+  }
+
+  /* --- Question Section --- */
+  #question {
+    width: 100vw !important;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  #question-text {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  #question-feedback {
+    font-size: 16px;
+  }
+
+  #question button {
+    width: 100%;
+    max-width: 300px;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* --- Final Overlay --- */
+  #final-image {
+    max-width: 92vw;
+    max-height: 70vh;
+    min-width: unset;
+    min-height: unset;
+  }
+
+  #close-overlay {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — Small phones (≤ 400px)
+   ========================================================= */
+
+@media (max-width: 400px) {
+  .year-badge {
+    font-size: 18px;
+    margin-left: 6px;
+    padding: 6px 12px;
+  }
+
+  .events {
+    padding: 12px 12px 12px 44px;
+    gap: 12px;
+  }
+
+  .event img {
+    height: 160px;
+  }
+
+  #question-text {
+    font-size: 19px;
+  }
+}

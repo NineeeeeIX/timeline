@@ -102,8 +102,22 @@ timelineData.forEach((yearData, yearIndex) => {
   yearData.events.forEach((eventData) => {
     const event = document.createElement("article");
     event.className = "event";
+
+    // รองรับทั้ง image (URL ImageKit) และ video (URL ImageKit)
+    const mediaHTML = eventData.video
+      ? `<video src="${eventData.video}" autoplay muted loop playsinline></video>`
+      : `<img src="${eventData.image}" alt="${eventData.title}">`;
+
+    // วันที่ — chip ซ้อนบนรูป/วิดีโอ (ถ้ามี date)
+    const dateHTML = eventData.date
+      ? `<span class="date-overlay">${eventData.date}</span>`
+      : "";
+
     event.innerHTML = `
-      <img src="${eventData.image}" alt="${eventData.title}">
+      <div class="event-media">
+        ${mediaHTML}
+        ${dateHTML}
+      </div>
       <h2>${eventData.title}</h2>
       <p>${eventData.text}</p>
     `;

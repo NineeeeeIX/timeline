@@ -8,6 +8,48 @@ const finalOverlay = document.getElementById("final-overlay");
 const wrapper = document.getElementById("viewport-wrapper");
 
 /* =========================================================
+   INTRO OVERLAY & BGM
+   ========================================================= */
+
+const introOverlay  = document.getElementById("intro-overlay");
+const introStartBtn = document.getElementById("intro-start");
+const bgm           = document.getElementById("bgm");
+const volumeControl = document.getElementById("volume-control");
+const volumeBtn     = document.getElementById("volume-btn");
+const volumeSlider  = document.getElementById("volume-slider");
+
+// ตั้ง volume เริ่มต้น
+bgm.volume = 0.3;
+volumeSlider.value = 0.3;
+
+// กดปุ่ม START → เล่นเสียง + fade intro ออก
+introStartBtn.addEventListener("click", () => {
+  bgm.play().catch(() => {}); // catch เผื่อ browser block
+
+  introOverlay.classList.add("hide");
+
+  // หลัง fade เสร็จ → ลบ overlay ออกจาก DOM + แสดงปุ่ม volume
+  setTimeout(() => {
+    introOverlay.remove();
+    volumeControl.classList.add("visible");
+  }, 1300);
+});
+
+// ปุ่ม Volume — toggle mute
+volumeBtn.addEventListener("click", () => {
+  bgm.muted = !bgm.muted;
+  volumeBtn.textContent = bgm.muted ? "🔇" : "🔊";
+});
+
+// Slider — ปรับระดับเสียง
+volumeSlider.addEventListener("input", () => {
+  bgm.volume = parseFloat(volumeSlider.value);
+  bgm.muted = bgm.volume === 0;
+  volumeBtn.textContent = bgm.muted ? "🔇" : "🔊";
+});
+
+
+/* =========================================================
    RESPONSIVE CONFIG
    ========================================================= */
 

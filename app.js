@@ -1,3 +1,7 @@
+/* =========================================================
+   DOM REFERENCES
+   ========================================================= */
+
 const timeline = document.getElementById("timeline");
 const timelineTrack = document.getElementById("timeline-track");
 const questionSection = document.getElementById("question");
@@ -5,20 +9,40 @@ const questionFeedback = document.getElementById("question-feedback");
 const choice1 = document.getElementById("choice-1");
 const choice2 = document.getElementById("choice-2");
 const finalOverlay = document.getElementById("final-overlay");
+const closeOverlay = document.getElementById("close-overlay");
 const wrapper = document.getElementById("viewport-wrapper");
+const introOverlay = document.getElementById("intro-overlay");
+const introStartBtn = document.getElementById("intro-start");
+const bgm = document.getElementById("bgm");
+const volumeControl = document.getElementById("volume-control");
+const volumeBtn = document.getElementById("volume-btn");
+const volumeSlider = document.getElementById("volume-slider");
+
+/* =========================================================
+   WRONG-ANSWER MESSAGES — เพิ่มคำได้เรื่อยๆ ในอาร์เรย์นี้
+   ========================================================= */
+
+const wrongMessages = [
+  "ลองคิดอีกที 🤔",
+  "ไม่ใช่อันนั้นนะ 🙈",
+  "ใจเย็นๆ แล้วคิดใหม่ 💭",
+  "ผิดแล้ว ลองใหม่นะ 💕",
+  "เกือบแล้ว ลองดูอีกที ✨",
+  "อย่าเพิ่งยอมแพ้นะ 🌸",
+];
+
+let wrongMessageIndex = 0;
+
+function getNextWrongMessage() {
+  const msg = wrongMessages[wrongMessageIndex];
+  wrongMessageIndex = (wrongMessageIndex + 1) % wrongMessages.length;
+  return msg;
+}
 
 /* =========================================================
    INTRO OVERLAY & BGM
    ========================================================= */
 
-const introOverlay  = document.getElementById("intro-overlay");
-const introStartBtn = document.getElementById("intro-start");
-const bgm           = document.getElementById("bgm");
-const volumeControl = document.getElementById("volume-control");
-const volumeBtn     = document.getElementById("volume-btn");
-const volumeSlider  = document.getElementById("volume-slider");
-
-// ตั้ง volume เริ่มต้น
 bgm.volume = 0.3;
 volumeSlider.value = 0.3;
 
@@ -48,29 +72,25 @@ volumeSlider.addEventListener("input", () => {
   volumeBtn.textContent = bgm.muted ? "🔇" : "🔊";
 });
 
-
 /* =========================================================
    RESPONSIVE CONFIG
    ========================================================= */
 
 function getResponsiveConfig() {
   const w = window.innerWidth;
-  if (w <= 400) {
+  if (w <= 400)
     return { eventWidth: 130, eventGap: 16, branchGap: 24, nextBtnWidth: 100 };
-  }
-  if (w <= 768) {
+  if (w <= 768)
     return { eventWidth: 160, eventGap: 16, branchGap: 30, nextBtnWidth: 120 };
-  }
-  if (w <= 1024) {
+  if (w <= 1024)
     return { eventWidth: 200, eventGap: 20, branchGap: 40, nextBtnWidth: 150 };
-  }
   return { eventWidth: 300, eventGap: 30, branchGap: 80, nextBtnWidth: 180 };
 }
 
 const config = getResponsiveConfig();
 
 /* =========================================================
-   STATE
+   STATE MACHINE
    ========================================================= */
 
 let currentYearIndex = 0;
@@ -83,7 +103,7 @@ function setState(newState) {
 }
 
 /* =========================================================
-   คำนวณความกว้าง
+   WORLD WIDTH
    ========================================================= */
 
 function getEventsWidth(eventCount) {
@@ -97,7 +117,6 @@ function getEventsWidth(eventCount) {
 const maxEventsWidth = Math.max(
   ...timelineData.map((d) => getEventsWidth(d.events.length)),
 );
-
 const outerEventDistance = config.branchGap + maxEventsWidth;
 const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 100) * 2);
 
@@ -106,21 +125,19 @@ timeline.style.width = `${worldWidth}px`;
 questionSection.style.width = `${worldWidth}px`;
 
 /* =========================================================
-   สร้าง Year Sections
+   BUILD TIMELINE — สร้าง Year Sections จาก timelineData
    ========================================================= */
 
 const yearSections = [];
 
 timelineData.forEach((yearData, yearIndex) => {
+  /* ----- Section ----- */
   const yearSection = document.createElement("section");
   yearSection.className = "year-section";
   yearSection.style.width = `${worldWidth}px`;
+  yearSection.classList.add(yearIndex % 2 === 0 ? "left" : "right");
 
-  /* สลับซ้าย / ขวา */
-  const isLeft = yearIndex % 2 === 0;
-  yearSection.classList.add(isLeft ? "left" : "right");
-
-  /* Year Badge */
+  /* ----- Year Badge ----- */
   const yearBadge = document.createElement("div");
   yearBadge.className = "year-badge";
   yearBadge.innerHTML = `
@@ -128,16 +145,16 @@ timelineData.forEach((yearData, yearIndex) => {
     <div class="year-dot"></div>
   `;
 
-  /* ปุ่ม "ดู" (ตามฝั่งรูปของแต่ละปี) */
+  /* ----- Story Button ----- */
   const viewBtn = document.createElement("button");
   viewBtn.className = "view-btn";
-  viewBtn.textContent = "ดู";
+  viewBtn.textContent = "Story";
 
-  /* Branch Line */
+  /* ----- Branch Line ----- */
   const branchLine = document.createElement("div");
   branchLine.className = "branch-line";
 
-  /* Events Container */
+  /* ----- Events Container ----- */
   const events = document.createElement("div");
   events.className = "events";
 
@@ -145,12 +162,12 @@ timelineData.forEach((yearData, yearIndex) => {
     const event = document.createElement("article");
     event.className = "event";
 
-    // รองรับทั้ง image (URL ImageKit) และ video (URL ImageKit)
+    // รองรับทั้ง image และ video
     const mediaHTML = eventData.video
       ? `<video src="${eventData.video}" autoplay muted loop playsinline></video>`
       : `<img src="${eventData.image}" alt="${eventData.title}">`;
 
-    // วันที่ — chip ซ้อนบนรูป/วิดีโอ (ถ้ามี date)
+    // date chip (optional)
     const dateHTML = eventData.date
       ? `<span class="date-overlay">${eventData.date}</span>`
       : "";
@@ -166,66 +183,56 @@ timelineData.forEach((yearData, yearIndex) => {
     events.appendChild(event);
   });
 
-  /* ปุ่ม "ต่อไป" (ต่อจากรูปสุดท้าย) */
+  /* ----- Next / Question Button ----- */
   const nextButton = document.createElement("button");
   nextButton.className = "next-button";
   nextButton.textContent =
-    yearIndex === timelineData.length - 1 ? "ไปที่คำถาม" : "ต่อไป";
+    yearIndex === timelineData.length - 1 ? "Question" : "Next";
   events.appendChild(nextButton);
 
   /* ----- Event Listeners ----- */
-
   viewBtn.addEventListener("click", () => expandYear(yearIndex));
   nextButton.addEventListener("click", () => goToNext(yearIndex));
 
-  /* ----- ประกอบ Section ----- */
-
-  yearSection.appendChild(yearBadge);
-  yearSection.appendChild(viewBtn);
-  yearSection.appendChild(branchLine);
-  yearSection.appendChild(events);
-
+  /* ----- Assemble ----- */
+  yearSection.append(yearBadge, viewBtn, branchLine, events);
   timeline.appendChild(yearSection);
 
   yearSections.push({ section: yearSection, viewBtn, events, branchLine });
 });
 
 /* =========================================================
-   ตำแหน่งกลางของ Timeline
+   SCROLL HELPERS
    ========================================================= */
 
 function getCenterScrollPosition() {
   return (worldWidth - window.innerWidth) / 2;
 }
 
+function scrollToCenter(behavior = "smooth") {
+  wrapper.scrollTo({ left: getCenterScrollPosition(), top: 0, behavior });
+}
+
 /* =========================================================
-   แสดงปี — โฟกัสที่เส้น Timeline
+   SHOW YEAR — โฟกัสที่เส้น Timeline
    ========================================================= */
 
 function showYear(index) {
   currentYearIndex = index;
   setState("VIEWING_YEAR");
 
-  const { viewBtn } = yearSections[index];
-
-  /* เลื่อน track แนวตั้งด้วย GPU transform */
+  // เลื่อน track แนวตั้งด้วย GPU transform
   timelineTrack.style.transform = `translateY(-${index * 100}vh)`;
+  scrollToCenter();
 
-  /* โฟกัสแนวนอนที่เส้น Timeline */
-  wrapper.scrollTo({
-    left: getCenterScrollPosition(),
-    top: 0,
-    behavior: "smooth",
-  });
-
-  /* แสดงปุ่ม "ดู" หลัง scroll เสร็จ */
+  // แสดงปุ่ม Story หลัง scroll เสร็จ
   setTimeout(() => {
-    viewBtn.classList.add("visible");
+    yearSections[index].viewBtn.classList.add("visible");
   }, 600);
 }
 
 /* =========================================================
-   กระจายรูป — Animation
+   EXPAND YEAR — กระจายรูป + stagger animation
    ========================================================= */
 
 function expandYear(index) {
@@ -233,19 +240,15 @@ function expandYear(index) {
 
   const { section, viewBtn, events } = yearSections[index];
 
-  /* ซ่อนปุ่ม "ดู" */
   viewBtn.classList.remove("visible");
-
-  /* กระจายรูป + branch line */
   section.classList.add("expanded");
 
-  /* Staggered delay — การ์ดทยอยโผล่ทีละใบ */
-  const children = events.children;
-  for (let i = 0; i < children.length; i++) {
-    children[i].style.transitionDelay = `${i * 0.12}s`;
-  }
+  // Staggered delay — การ์ดทยอยโผล่ทีละใบ
+  Array.from(events.children).forEach((child, i) => {
+    child.style.transitionDelay = `${i * 0.12}s`;
+  });
 
-  /* Nudge scroll ไปทางที่มี events เพื่อให้เห็นการ์ดแรก */
+  // Nudge scroll ไปทางที่มี events เพื่อให้เห็นการ์ดแรก
   const isLeft = section.classList.contains("left");
   const nudge = Math.min(
     config.eventWidth + config.branchGap,
@@ -253,65 +256,58 @@ function expandYear(index) {
   );
 
   setTimeout(() => {
-    if (state === "EXPLORING") {
-      wrapper.scrollTo({
-        left: isLeft
-          ? getCenterScrollPosition() - nudge
-          : getCenterScrollPosition() + nudge,
-        top: 0,
-        behavior: "smooth",
-      });
-    }
+    if (state !== "EXPLORING") return;
+    wrapper.scrollTo({
+      left: isLeft
+        ? getCenterScrollPosition() - nudge
+        : getCenterScrollPosition() + nudge,
+      top: 0,
+      behavior: "smooth",
+    });
   }, 250);
 }
 
 /* =========================================================
-   ไปปีถัดไป / ไปคำถาม
+   GO TO NEXT — ยุบปีปัจจุบัน แล้วไปปีถัดไป / ไปคำถาม
    ========================================================= */
 
-function goToNext(index) {
+function collapseYear(index) {
   const { section, events } = yearSections[index];
-
-  /* Reset delay → collapse ทันที */
-  const children = events.children;
-  for (let i = 0; i < children.length; i++) {
-    children[i].style.transitionDelay = "0s";
-  }
-
-  /* ยุบรูปกลับ */
+  // Reset transition delay → ยุบพร้อมกันทันที
+  Array.from(events.children).forEach((child) => {
+    child.style.transitionDelay = "0s";
+  });
   section.classList.remove("expanded");
+}
+
+function goToNext(index) {
+  collapseYear(index);
 
   if (index < timelineData.length - 1) {
-    /* ไปปีถัดไป */
     setTimeout(() => showYear(index + 1), 400);
   } else {
-    /* ปีสุดท้าย → ไปคำถาม */
+    // ปีสุดท้าย → ไปคำถาม
     setTimeout(() => {
       setState("QUESTION");
       timelineTrack.style.transform = `translateY(-${timelineData.length * 100}vh)`;
-      wrapper.scrollTo({
-        left: getCenterScrollPosition(),
-        top: 0,
-        behavior: "smooth",
-      });
+      scrollToCenter();
     }, 400);
   }
 }
 
 /* =========================================================
-   คำถาม — ล็อกคำตอบ
+   QUESTION — ตัวเลือก
    ========================================================= */
 
-/* ตัวเลือก 1 = ถูกต้อง */
+// ตัวเลือก 1 = ถูกต้อง
 choice1.addEventListener("click", () => {
   if (state !== "QUESTION") return;
 
   questionFeedback.textContent = "";
   setState("FINISHED");
 
-  /* แสดง overlay รูปใหญ่ */
+  // แสดง overlay รูปใหญ่
   finalOverlay.classList.add("show");
-
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       finalOverlay.style.opacity = "1";
@@ -319,11 +315,11 @@ choice1.addEventListener("click", () => {
   });
 });
 
-/* ตัวเลือก 2 = ผิด */
+// ตัวเลือก 2 = ผิด → หมุนเวียนข้อความจาก wrongMessages
 choice2.addEventListener("click", () => {
   if (state !== "QUESTION") return;
 
-  questionFeedback.textContent = "ลองคิดอีกที 🤔";
+  questionFeedback.textContent = getNextWrongMessage();
   questionFeedback.classList.remove("shake");
 
   requestAnimationFrame(() => {
@@ -332,25 +328,20 @@ choice2.addEventListener("click", () => {
 });
 
 /* =========================================================
-   ปิด Overlay → เลื่อนดูเว็ปได้อิสระ
+   FINAL OVERLAY — ปิด + เข้า FREE mode
    ========================================================= */
-
-const closeOverlay = document.getElementById("close-overlay");
 
 closeOverlay.addEventListener("click", () => {
   finalOverlay.classList.remove("show");
   finalOverlay.style.opacity = "";
 
-  /* เข้า FREE mode — expand ทุกปี, เลื่อนได้อิสระ */
   setState("FREE");
 
   timelineTrack.style.transition = "none";
   timelineTrack.style.transform = "none";
 
-  /* expand ทุก section ให้ดูได้หมด */
-  yearSections.forEach(({ section }) => {
-    section.classList.add("expanded");
-  });
+  // expand ทุก section ให้ดูได้หมด
+  yearSections.forEach(({ section }) => section.classList.add("expanded"));
 
   wrapper.scrollTo({
     left: getCenterScrollPosition(),
@@ -360,10 +351,10 @@ closeOverlay.addEventListener("click", () => {
 });
 
 /* =========================================================
-   เริ่มต้น
+   INIT
    ========================================================= */
 
-/* บังคับให้ refresh กลับไปบนสุดเสมอ */
+// บังคับให้ refresh กลับไปบนสุดเสมอ
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
 }
@@ -371,14 +362,9 @@ if ("scrollRestoration" in history) {
 window.addEventListener("load", () => {
   setState("VIEWING_YEAR");
   timelineTrack.style.transform = "translateY(0px)";
+  scrollToCenter("instant");
 
-  wrapper.scrollTo({
-    left: getCenterScrollPosition(),
-    top: 0,
-    behavior: "instant",
-  });
-
-  /* แสดงปุ่ม "ดู" ของปีแรกหลัง load */
+  // แสดงปุ่ม Story ของปีแรกหลัง load
   setTimeout(() => {
     yearSections[0].viewBtn.classList.add("visible");
   }, 600);
@@ -386,10 +372,6 @@ window.addEventListener("load", () => {
 
 window.addEventListener("resize", () => {
   if (state === "VIEWING_YEAR" || state === "QUESTION") {
-    wrapper.scrollTo({
-      left: getCenterScrollPosition(),
-      top: 0,
-      behavior: "instant",
-    });
+    scrollToCenter("instant");
   }
 });

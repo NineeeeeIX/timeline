@@ -5,7 +5,7 @@ const timelineData = [
       {
         // รูปภาพ: ใส่ URL ImageKit ใน image | วิดีโอ: ใส่ใน video
         image: "https://ik.imagekit.io/YOUR_ID/YOUR_FOLDER/photo4.jpg",
-        date: "12 ม.ค. 2565",   // ใส่ date เพื่อแสดง chip บนรูป, ไม่ใส่ก็ไม่แสดง
+        date: "12 ม.ค. 2565", // ใส่ date เพื่อแสดง chip บนรูป, ไม่ใส่ก็ไม่แสดง
         title: "เหตุการณ์ที่ 1",
         text: "คำอธิบายของเหตุการณ์ที่ 1",
       },

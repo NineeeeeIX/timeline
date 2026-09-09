@@ -3,61 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Timeline</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+    <title>Our Timeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-
     <!-- =========================================
          INTRO OVERLAY
          ========================================= -->
 
     <div id="intro-overlay">
       <div id="intro-content">
-        <button id="intro-start">▶&ensp;เริ่มต้น</button>
+        <button id="intro-start">▶&ensp;Start</button>
       </div>
     </div>
 
     <!-- BGM -->
     <audio id="bgm" loop>
-      <source src="https://ik.imagekit.io/nineix/timeline/tunetank-music-box-sleep-lullaby-349471.mp3" type="audio/mpeg">
+      <source
+        src="https://ik.imagekit.io/nineix/timeline/tunetank-music-box-sleep-lullaby-349471.mp3"
+        type="audio/mpeg"
+      />
     </audio>
 
     <!-- Volume Control (ขวาล่าง) -->
     <div id="volume-control">
-      <input type="range" id="volume-slider" min="0" max="1" step="0.02" value="0.5" orient="vertical">
-      <button id="volume-btn" title="ปรับเสียง">🔊</button>
+      <input
+        type="range"
+        id="volume-slider"
+        min="0"
+        max="1"
+        step="0.02"
+        value="0.5"
+        orient="vertical"
+      />
+      <button id="volume-btn" title="Volume">🔊</button>
     </div>
 
     <div id="viewport-wrapper">
       <div id="timeline-track">
-
-      <!-- =========================================
+        <!-- =========================================
            TIMELINE
            ========================================= -->
 
-      <main id="timeline">
-        <div id="timeline-line"></div>
-        <!-- year sections สร้างจาก JS -->
-      </main>
+        <main id="timeline">
+          <div id="timeline-line"></div>
+          <!-- year sections สร้างจาก JS -->
+        </main>
 
-      <!-- =========================================
+        <!-- =========================================
            QUESTION
            ========================================= -->
 
-      <section id="question">
-        <div id="question-content">
-          <h1 id="question-text">เราเจอกันครั้งแรกที่ไหน?</h1>
-          <p id="question-feedback"></p>
-          <button id="choice-1">ร้านกาแฟหน้ามหาลัย</button>
-          <button id="choice-2">สนามบินสุวรรณภูมิ</button>
-        </div>
-      </section>
-
+        <section id="question">
+          <div id="question-content">
+            <h1 id="question-text">เราเจอกันครั้งแรกที่ไหน?</h1>
+            <p id="question-feedback"></p>
+            <button id="choice-1">ร้านกาแฟหน้ามหาลัย</button>
+            <button id="choice-2">สนามบินสุวรรณภูมิ</button>
+          </div>
+        </section>
       </div>
     </div>
 

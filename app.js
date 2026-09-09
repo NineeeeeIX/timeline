@@ -118,7 +118,8 @@ const maxEventsWidth = Math.max(
   ...timelineData.map((d) => getEventsWidth(d.events.length)),
 );
 const outerEventDistance = config.branchGap + maxEventsWidth;
-const worldWidth = Math.max(window.innerWidth, (outerEventDistance + 100) * 2);
+const contentWidth = (outerEventDistance + 100) * 2; // ความกว้างขั้นต่ำที่ต้องการสำหรับ content
+let worldWidth = Math.max(window.innerWidth, contentWidth);
 
 timelineTrack.style.width = `${worldWidth}px`;
 timeline.style.width = `${worldWidth}px`;
@@ -200,6 +201,22 @@ timelineData.forEach((yearData, yearIndex) => {
 
   yearSections.push({ section: yearSection, viewBtn, events, branchLine });
 });
+
+/* =========================================================
+   UPDATE WORLD WIDTH — ขยาย worldWidth ถ้า viewport กว้างกว่า
+   ========================================================= */
+
+function updateWorldWidth() {
+  const needed = Math.max(window.innerWidth, contentWidth);
+  if (needed <= worldWidth) return; // worldWidth มีแต่จะขยาย ไม่มีทางหด
+  worldWidth = needed;
+  timelineTrack.style.width = `${worldWidth}px`;
+  timeline.style.width = `${worldWidth}px`;
+  questionSection.style.width = `${worldWidth}px`;
+  yearSections.forEach(({ section }) => {
+    section.style.width = `${worldWidth}px`;
+  });
+}
 
 /* =========================================================
    SCROLL HELPERS
@@ -371,7 +388,15 @@ window.addEventListener("load", () => {
 });
 
 window.addEventListener("resize", () => {
+  updateWorldWidth();
   if (state === "VIEWING_YEAR" || state === "QUESTION") {
     scrollToCenter("instant");
+  } else if (state === "FREE") {
+    // FREE mode: recenter แนวนอนเท่านั้น ไม่ reset ตำแหน่งแนวตั้ง
+    wrapper.scrollTo({
+      left: getCenterScrollPosition(),
+      top: wrapper.scrollTop,
+      behavior: "instant",
+    });
   }
 });

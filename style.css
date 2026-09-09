@@ -335,6 +335,22 @@ body.state-free .next-button {
   display: none;
 }
 
+/* FREE mode → ย่อระยะห่างระหว่างปีให้ดูภาพรวมได้ */
+body.state-free .year-section {
+  height: clamp(240px, 38vh, 360px);
+}
+
+/* FREE mode → padding บนสุดเพื่อไม่ให้ปีแรกชิดขอบจอ */
+body.state-free #timeline-track {
+  padding-top: 60px;
+}
+
+/* FREE mode → ย่อ question section ให้สมส่วนกับ year sections */
+body.state-free #question {
+  min-height: clamp(300px, 50vh, 450px);
+  padding: 0;
+}
+
 /* =========================================================
    TIMELINE WORLD
    ========================================================= */
